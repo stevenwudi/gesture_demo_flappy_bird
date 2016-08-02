@@ -6,9 +6,11 @@ import math
 import SimpleGUICS2Pygame.simpleguics2pygame as simplegui
 from classes.flagg_bird_classes import *
 
+
 def draw(canvas):
     game.update()
     game.draw(canvas)
+
 
 frame = simplegui.create_frame("Flappy", width, height)
 frame.set_keydown_handler(keydown)
@@ -17,7 +19,7 @@ frame.set_draw_handler(draw)
 track_flag = False
 cap = cv2.VideoCapture(0)
 # hand position
-hand_pos = [50, 150, 150, 250]
+hand_pos = [250, 250, 350, 350]
 
 # dlib correlation tracker
 tracker = dlib.correlation_tracker()
@@ -79,44 +81,8 @@ while cap.isOpened():
             pos = tracker.get_position()
             track_pos_prev = [(pos.left() + pos.right()) / 2., (pos.top() + pos.bottom()) / 2.]
             # we start the game if there is a hand detected
-            game.start()
+            game.start(cap, tracker, track_pos_prev)
             frame.start()
-    else:
-        tracker.update(img)
-        pos = tracker.get_position()
-        pos = tracker.get_position()
-        track_pos_current = [(pos.left() + pos.right()) / 2., (pos.top() + pos.bottom()) / 2.]
-        vertical_ratio = np.abs(track_pos_current[1] - track_pos_prev[1]) / img.shape[1]
-        print("Vertical ration is %f" % vertical_ratio)
-        # if the ratio is larger than 0.1, then it is a jump
-        # the jump time should larger than 0.1 second
-        if vertical_ratio > 0.1:
-            toc = time.clock()
-            elapse_time = toc - tic
-            if elapse_time > 0.1:
-                if game.phase[0] or game.phase[1]:
-                    jump.play()
-                    game.bird.flap()
-                    tic = time.clock()
-                    if game.phase[0]:
-                        game.phase[0] = False
-                        game.phase[1] = True
-                elif game.phase[3]:
-                    game.phase[3] = False
-                    game.start()
-                    tic = time.clock()
-
-        cv2.rectangle(img, (int(pos.right()), int(pos.bottom())), (int(pos.left()), int(pos.top())),(255,0,0),0)
-        left = max(0, int(pos.left()))
-        right = min(img.shape[0], int(pos.right()))
-        top = max(0, int(pos.top()))
-        bottom = min(img.shape[1], int(pos.bottom()))
-        crop_img = img[top:bottom, left:right]
-        cv2.imshow('Gesture', img)
-        cv2.imshow('hand', crop_img)
-        k = cv2.waitKey(10)
-        if k == 27:
-            break
 
     k = cv2.waitKey(10)
     if k == 27:
