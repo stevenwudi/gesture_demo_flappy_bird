@@ -14,7 +14,7 @@ half_gap = [gap_width / 2, gap_height / 2]
 # flap_up_velocity
 flap_up_velocity = 1  # difficulty level, 1:easies, 2:moderate hard, 3: very hard
 fall_velocity = 0.1
-jump_vertical_ratio = 0.1
+jump_vertical_ratio = 0.08
 
 
 
@@ -181,7 +181,7 @@ class Game:
         crop_img = img[top:bottom, left:right]
         cv2.imshow('Gesture', img)
         cv2.imshow('Hand', crop_img)
-        cv2.waitKey(16)
+        cv2.waitKey(15)
 
         if self.phase[3]:
             return

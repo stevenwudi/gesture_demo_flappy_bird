@@ -18,7 +18,7 @@ frame = simplegui.create_frame("Flappy bird game using hand control", width, hei
 frame.set_draw_handler(draw)
 
 hand_pos = [250, 250, 350, 350]  # hand position
-hand_convex_number = 0
+hand_convex_number = 3
 
 track_flag = False  # track flag indicate whether we have a hand detected and start tracking
 tracker = dlib.correlation_tracker()  # dlib correlation tracker initialisation

@@ -49,12 +49,12 @@ def detect_hand(img, hand_pos):
             cv2.circle(crop_img, far, 1, [0, 0, 255], -1)
         cv2.line(crop_img, start, end, [0, 255, 0], 2)
 
-    cv2.namedWindow('Gesture')
-    cv2.moveWindow('Gesture', 1000, 110)
-    cv2.namedWindow('Hand')
-    cv2.moveWindow('Hand', 1000, 100-crop_img.shape[1])
-    cv2.namedWindow('Thresholded')
-    cv2.moveWindow('Thresholded', 1000 + crop_img.shape[0], 100-crop_img.shape[1])
+    # cv2.namedWindow('Gesture')
+    # cv2.moveWindow('Gesture', 1000, 110)
+    # cv2.namedWindow('Hand')
+    # cv2.moveWindow('Hand', 1000, 100-crop_img.shape[1])
+    # cv2.namedWindow('Thresholded')
+    # cv2.moveWindow('Thresholded', 1000 + crop_img.shape[0], 100-crop_img.shape[1])
 
     cv2.imshow('Gesture', img)
     cv2.imshow('Hand', crop_img)

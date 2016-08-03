@@ -7,7 +7,7 @@ ground_height = 42
 center = [width / 2, height / 2]
 half_gap = [gap_width / 2, gap_height / 2]
 
-difficulty = 2  # difficulty level, 1:easies, 2:moderate hard, 3: very hard
+difficulty = 1.5 # difficulty level, 1:easies, 2:moderate hard, 3: very hard
 class Image:
     def __init__(self, url, size):
         self.url = url
