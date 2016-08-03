@@ -4,6 +4,19 @@ import numpy as np
 import cv2
 import SimpleGUICS2Pygame.simpleguics2pygame as simplegui
 
+width, height = 400, 400
+gap_width, gap_height = 40, 80
+gap_pos_min, gap_pos_max = 140, 280
+ground_height = 42
+center = [width / 2, height / 2]
+half_gap = [gap_width / 2, gap_height / 2]
+
+# flap_up_velocity
+flap_up_velocity = 1  # difficulty level, 1:easies, 2:moderate hard, 3: very hard
+fall_velocity = 0.1
+jump_vertical_ratio = 0.1
+
+
 
 class Image:
     def __init__(self, url, size):
@@ -28,13 +41,6 @@ class Sound:
         self.sound[self.count].play()
         self.count = (self.count + 1) % 3
 
-width, height = 400, 400
-gap_width, gap_height = 40, 80
-gap_pos_min, gap_pos_max = 120, 280
-ground_height = 42
-center = [width / 2, height / 2]
-half_gap = [gap_width / 2, gap_height / 2]
-
 
 bird0 = Image('./flappy_bird_image/bird0.png', [30, 22])
 bird1 = Image('./flappy_bird_image/bird1.png', [30, 22])
@@ -48,8 +54,6 @@ coin = simplegui._load_local_sound('./flappy_bird_sound/coin.wav')
 bump = simplegui._load_local_sound('./flappy_bird_sound/bump.wav')
 end = simplegui._load_local_sound('./flappy_bird_sound/end.wav')
 jump = Sound('./flappy_bird_sound/jump.wav')
-
-difficulty = 1.5 # difficulty level, 1:easies, 2:moderate hard, 3: very hard
 
 
 class Bird:
@@ -76,11 +80,11 @@ class Bird:
             self.image = bird1
 
     def fall(self):
-        self.vel += 0.1
+        self.vel += fall_velocity
         self.pos[1] += self.vel
 
     def flap(self):
-        self.vel = -1 * difficulty
+        self.vel = -1 * flap_up_velocity
 
     def draw(self, canvas):
         self.image.draw(canvas, self.pos, self.image.size, 0.12 * self.vel)
@@ -88,7 +92,7 @@ class Bird:
 
 class Pipe:
     def __init__(self, pos, vertical_move_scale=0):
-        self.pos = pos # gap center
+        self.pos = pos  # gap center
         self.vertical_center = self.pos[1]
         self.vertical_move = 0
         self.vertical_move_scale = vertical_move_scale
@@ -144,12 +148,10 @@ class Game:
                  Pipe([650, random.randrange(gap_pos_min, gap_pos_max)]),
                  Pipe([800, random.randrange(gap_pos_min, gap_pos_max)])]
         self.score = 0
-        self.time = 0
         self.phase[0] = True
         self.cap = cap
         self.tracker = tracker
         self.track_pos_prev = track_pos_prev
-
 
     def update(self):
         # cap, tracker, track_pos_prev:
@@ -159,9 +161,8 @@ class Game:
         track_pos_current = [(pos.left() + pos.right()) / 2., (pos.top() + pos.bottom()) / 2.]
         vertical_ratio = np.abs(track_pos_current[1] - self.track_pos_prev[1]) / img.shape[1]
         print("Vertical ration is %f" % vertical_ratio)
-        # if the ratio is larger than 0.1, then it is a jump
-        # the jump time should larger than 0.1 second
-        if vertical_ratio > 0.08:
+        # if the ratio is larger than jump_vertical_ratio, then it is a jump
+        if vertical_ratio > jump_vertical_ratio:
             if self.phase[0] or self.phase[1]:
                 jump.play()
                 self.bird.flap()
@@ -172,15 +173,15 @@ class Game:
                 self.phase[3] = False
                 self.start(self.cap, self.tracker, self.track_pos_prev)
 
-        cv2.rectangle(img, (int(pos.right()), int(pos.bottom())), (int(pos.left()), int(pos.top())),(255,0,0),0)
+        cv2.rectangle(img, (int(pos.right()), int(pos.bottom())), (int(pos.left()), int(pos.top())), (255, 0, 0) ,0)
         left = max(0, int(pos.left()))
         right = min(img.shape[0], int(pos.right()))
         top = max(0, int(pos.top()))
         bottom = min(img.shape[1], int(pos.bottom()))
         crop_img = img[top:bottom, left:right]
         cv2.imshow('Gesture', img)
-        cv2.imshow('hand', crop_img)
-        k = cv2.waitKey(1)
+        cv2.imshow('Hand', crop_img)
+        cv2.waitKey(16)
 
         if self.phase[3]:
             return
@@ -242,17 +243,11 @@ class Game:
         else:
             canvas.draw_text(str(self.score), [200, 80], 30, 'DeepSkyBlue', 'sans-serif')
 
+
 game = Game()
 
-def keydown(key):
-    if key == simplegui.KEY_MAP['space']:
-        if game.phase[0] or game.phase[1]:
-            jump.play()
-            game.bird.flap()
-            if game.phase[0]:
-                game.phase[0] = False
-                game.phase[1] = True
-        elif game.phase[3]:
-            game.phase[3] = False
-            game.start()
+
+def draw(canvas):
+    game.update()
+    game.draw(canvas)
 
