@@ -8,25 +8,15 @@ email: stevenwudi@gmail.com
 import dlib
 import cv2
 import SimpleGUICS2Pygame.simpleguics2pygame as simplegui
-from classes.flagg_bird_classes import draw, game
-from classes.flagg_bird_classes import width, height
+from classes.flagg_bird_classes import draw, game, frame
+from classes.flagg_bird_classes import width, height, hand_pos, hand_convex_number
 from classes.hand_detect import detect_hand
 
-# create a simplegui frame
-global frame
-frame = simplegui.create_frame("Flappy bird game using hand control", width, height)
-# register simplegui frame keydown handler
-frame.set_draw_handler(draw)
-
-
-hand_pos = [250, 250, 350, 350]  # hand position
-hand_convex_number = 3
-
-global track_flag
 track_flag = False  # track flag indicate whether we have a hand detected and start tracking
 tracker = dlib.correlation_tracker()  # dlib correlation tracker initialisation
 
 cap = cv2.VideoCapture(0)   # capture the video using opencv video capture
+
 while cap.isOpened():
     ret, img = cap.read()
     if not track_flag:
