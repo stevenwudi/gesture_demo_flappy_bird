@@ -12,11 +12,11 @@ center = [width / 2, height / 2]
 half_gap = [gap_width / 2, gap_height / 2]
 
 # flap_up_velocity
-flap_up_velocity = 1  # difficulty level, 1:easies, 2:moderate hard, 3: very hard
-fall_velocity = 0.1
-jump_vertical_ratio = 0.1
-
-
+flap_up_velocity = 2  # difficulty level, 1:easies, 2:moderate hard, 3: very hard
+fall_velocity = 0.2
+jump_vertical_ratio = 0.01
+global track_flag
+global frame
 
 class Image:
     def __init__(self, url, size):
@@ -27,19 +27,6 @@ class Image:
     def draw(self, canvas, pos, size, angle=0):
         center = [size[0] / 2.0, size[1] / 2.0]
         canvas.draw_image(self.image, center, size, pos, size, angle)
-
-
-class Sound:
-    def __init__(self, url):
-        self.url = url
-        self.count = 0
-        self.sound = {}
-        for i in range(3):
-            self.sound[i] = simplegui._load_local_sound (self.url)
-
-    def play(self):
-        self.sound[self.count].play()
-        self.count = (self.count + 1) % 3
 
 
 bird0 = Image('./flappy_bird_image/bird0.png', [30, 22])
@@ -53,7 +40,8 @@ board = Image('./flappy_bird_image/board.png', [78, 158])
 coin = simplegui._load_local_sound('./flappy_bird_sound/coin.wav')
 bump = simplegui._load_local_sound('./flappy_bird_sound/bump.wav')
 end = simplegui._load_local_sound('./flappy_bird_sound/end.wav')
-jump = Sound('./flappy_bird_sound/jump.wav')
+jump = simplegui._load_local_sound('./flappy_bird_sound/jump.wav')
+bg_music = simplegui._load_local_sound('./flappy_bird_sound/funky_bg.wav')
 
 
 class Bird:
@@ -144,14 +132,20 @@ class Game:
 
     def start(self, cap, tracker, track_pos_prev):
         self.bird = Bird([180, height / 2])
-        self.pipes = [Pipe([500, random.randrange(gap_pos_min, gap_pos_max)]),
-                 Pipe([650, random.randrange(gap_pos_min, gap_pos_max)]),
-                 Pipe([800, random.randrange(gap_pos_min, gap_pos_max)])]
+        self.pipes = [Pipe([300, random.randrange(gap_pos_min, gap_pos_max)]),
+                 Pipe([450, random.randrange(gap_pos_min, gap_pos_max)]),
+                 Pipe([600, random.randrange(gap_pos_min, gap_pos_max)])]
         self.score = 0
         self.phase[0] = True
         self.cap = cap
         self.tracker = tracker
         self.track_pos_prev = track_pos_prev
+        self.all_tracks = []
+        self.all_tracks.append(self.track_pos_prev)
+        bg_music.set_volume(0.4)
+        bg_music.play()
+
+
 
     def update(self):
         # cap, tracker, track_pos_prev:
@@ -159,7 +153,9 @@ class Game:
         self.tracker.update(img)
         pos = self.tracker.get_position()
         track_pos_current = [(pos.left() + pos.right()) / 2., (pos.top() + pos.bottom()) / 2.]
-        vertical_ratio = np.abs(track_pos_current[1] - self.track_pos_prev[1]) / img.shape[1]
+        vertical_ratio = (track_pos_current[1] - self.track_pos_prev[1]) / img.shape[1]
+
+        self.track_pos_prev = track_pos_current
         print("Vertical ration is %f" % vertical_ratio)
         # if the ratio is larger than jump_vertical_ratio, then it is a jump
         if vertical_ratio > jump_vertical_ratio:
@@ -173,7 +169,7 @@ class Game:
                 self.phase[3] = False
                 self.start(self.cap, self.tracker, self.track_pos_prev)
 
-        cv2.rectangle(img, (int(pos.right()), int(pos.bottom())), (int(pos.left()), int(pos.top())), (255, 0, 0) ,0)
+        cv2.rectangle(img, (int(pos.right()), int(pos.bottom())), (int(pos.left()), int(pos.top())), (255, 0, 0),0)
         left = max(0, int(pos.left()))
         right = min(img.shape[0], int(pos.right()))
         top = max(0, int(pos.top()))
@@ -181,12 +177,13 @@ class Game:
         crop_img = img[top:bottom, left:right]
         cv2.imshow('Gesture', img)
         cv2.imshow('Hand', crop_img)
-        cv2.waitKey(16)
+        #cv2.waitKey(16)
 
         if self.phase[3]:
             return
 
         if self.bird.out(-float('inf'), height - 42):
+            bg_music.pause()
             end.play()
             self.phase[1] = False
             self.phase[2] = False

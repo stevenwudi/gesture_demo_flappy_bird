@@ -13,13 +13,16 @@ from classes.flagg_bird_classes import width, height
 from classes.hand_detect import detect_hand
 
 # create a simplegui frame
+global frame
 frame = simplegui.create_frame("Flappy bird game using hand control", width, height)
 # register simplegui frame keydown handler
 frame.set_draw_handler(draw)
 
-hand_pos = [250, 250, 350, 350]  # hand position
-hand_convex_number = 0
 
+hand_pos = [250, 250, 350, 350]  # hand position
+hand_convex_number = 3
+
+global track_flag
 track_flag = False  # track flag indicate whether we have a hand detected and start tracking
 tracker = dlib.correlation_tracker()  # dlib correlation tracker initialisation
 
