@@ -14,7 +14,7 @@ center = [width / 2, height / 2]
 half_gap = [gap_width / 2, gap_height / 2]
 
 # flap_up_velocity
-flap_up_velocity = 2  # difficulty level, 1:easies, 2:moderate hard, 3: very hard
+flap_up_velocity = 0.5  # difficulty level, 1:easies, 2:moderate hard, 3: very hard
 fall_velocity = 0.2
 jump_vertical_ratio = 0.01
 hand_pos = [250, 250, 350, 350]  # hand position
@@ -54,6 +54,7 @@ class Bird:
         self.vel = 0
         self.time = 0
         self.image = None
+        self.flap_up_velocity = flap_up_velocity
 
     def between(self, left, right):
         return self.pos[0] + self.radius > left and self.pos[0] - self.radius < right
@@ -75,7 +76,7 @@ class Bird:
         self.pos[1] += self.vel
 
     def flap(self):
-        self.vel = -1 * flap_up_velocity
+        self.vel = -1 * self.flap_up_velocity
 
     def draw(self, canvas):
         self.image.draw(canvas, self.pos, self.image.size, 0.12 * self.vel)
@@ -155,6 +156,9 @@ class Game:
         pos = self.tracker.get_position()
         track_pos_current = [(pos.left() + pos.right()) / 2., (pos.top() + pos.bottom()) / 2.]
         vertical_ratio = (track_pos_current[1] - self.track_pos_prev[1]) / img.shape[1]
+        # we add the velocity is propotional to the hand motion function
+        self.bird.flap_up_velocity = vertical_ratio / jump_vertical_ratio * 1
+
         self.track_pos_prev = track_pos_current
 
         print("Vertical ration is %f" % vertical_ratio)
