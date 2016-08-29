@@ -51,8 +51,10 @@ def detect_hand(img, hand_pos):
 
     cv2.namedWindow('Gesture')
     cv2.moveWindow('Gesture', 2000, 210)
+
     cv2.namedWindow('Hand')
     cv2.moveWindow('Hand', 2000, 100-crop_img.shape[1])
+    
     cv2.namedWindow('Thresholded')
     cv2.moveWindow('Thresholded', 2000 + crop_img.shape[0], 100-crop_img.shape[1])
 
