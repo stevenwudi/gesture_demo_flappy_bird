@@ -176,7 +176,7 @@ class Game:
         bottom = min(img.shape[1], int(pos.bottom()))
         crop_img = img[top:bottom, left:right]
         cv2.imshow('Gesture', img)
-        cv2.imshow('Hand', crop_img)
+        #cv2.imshow('Hand', crop_img)
         #cv2.waitKey(16)
 
         if self.phase[3]:
