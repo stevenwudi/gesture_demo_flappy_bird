@@ -1,8 +1,10 @@
 import random
 import math
 import numpy as np
+import dlib
 import cv2
 import SimpleGUICS2Pygame.simpleguics2pygame as simplegui
+from hand_detect import detect_hand
 
 width, height = 400, 400
 gap_width, gap_height = 40, 80
@@ -12,11 +14,11 @@ center = [width / 2, height / 2]
 half_gap = [gap_width / 2, gap_height / 2]
 
 # flap_up_velocity
-flap_up_velocity = 2  # difficulty level, 1:easies, 2:moderate hard, 3: very hard
+flap_up_velocity = 0.5  # difficulty level, 1:easies, 2:moderate hard, 3: very hard
 fall_velocity = 0.2
 jump_vertical_ratio = 0.01
-global track_flag
-global frame
+hand_pos = [250, 250, 350, 350]  # hand position
+hand_convex_number = 3
 
 class Image:
     def __init__(self, url, size):
@@ -44,6 +46,7 @@ jump = simplegui._load_local_sound('./flappy_bird_sound/jump.wav')
 bg_music = simplegui._load_local_sound('./flappy_bird_sound/funky_bg.wav')
 
 
+
 class Bird:
     def __init__(self, pos):
         self.pos = pos
@@ -51,6 +54,7 @@ class Bird:
         self.vel = 0
         self.time = 0
         self.image = None
+        self.flap_up_velocity = flap_up_velocity
 
     def between(self, left, right):
         return self.pos[0] + self.radius > left and self.pos[0] - self.radius < right
@@ -72,7 +76,7 @@ class Bird:
         self.pos[1] += self.vel
 
     def flap(self):
-        self.vel = -1 * flap_up_velocity
+        self.vel = -1 * self.flap_up_velocity
 
     def draw(self, canvas):
         self.image.draw(canvas, self.pos, self.image.size, 0.12 * self.vel)
@@ -145,8 +149,6 @@ class Game:
         bg_music.set_volume(0.4)
         bg_music.play()
 
-
-
     def update(self):
         # cap, tracker, track_pos_prev:
         ret, img = self.cap.read()
@@ -154,8 +156,11 @@ class Game:
         pos = self.tracker.get_position()
         track_pos_current = [(pos.left() + pos.right()) / 2., (pos.top() + pos.bottom()) / 2.]
         vertical_ratio = (track_pos_current[1] - self.track_pos_prev[1]) / img.shape[1]
+        # we add the velocity is propotional to the hand motion function
+        self.bird.flap_up_velocity = vertical_ratio / jump_vertical_ratio * 1
 
         self.track_pos_prev = track_pos_current
+
         print("Vertical ration is %f" % vertical_ratio)
         # if the ratio is larger than jump_vertical_ratio, then it is a jump
         if vertical_ratio > jump_vertical_ratio:
@@ -169,6 +174,8 @@ class Game:
                 self.phase[3] = False
                 self.start(self.cap, self.tracker, self.track_pos_prev)
 
+
+
         cv2.rectangle(img, (int(pos.right()), int(pos.bottom())), (int(pos.left()), int(pos.top())), (255, 0, 0),0)
         left = max(0, int(pos.left()))
         right = min(img.shape[0], int(pos.right()))
@@ -180,6 +187,28 @@ class Game:
         #cv2.waitKey(16)
 
         if self.phase[3]:
+            # we restart here
+            track_flag = False
+            self.tracker = dlib.correlation_tracker()
+            while self.cap.isOpened():
+                ret, img = self.cap.read()
+                if not track_flag:
+                    count_defects = detect_hand(img, hand_pos)
+                    if count_defects > hand_convex_number:
+                        cv2.destroyWindow('Thresholded')
+                        self.tracker.start_track(img, dlib.rectangle(hand_pos[0], hand_pos[1], hand_pos[2], hand_pos[3]))
+                        track_flag = True
+                        pos = self.tracker.get_position()
+                        self.track_pos_prev = [(pos.left() + pos.right()) / 2., (pos.top() + pos.bottom()) / 2.]
+                        # we start the game if there is a hand detected
+                        self.__init__()
+                        self.start(self.cap, self.tracker, self.track_pos_prev)
+                        frame.start()
+                        return
+                    else:
+                        k = cv2.waitKey(1)
+                        if k == 27:
+                            break
             return
 
         if self.bird.out(-float('inf'), height - 42):
@@ -248,3 +277,7 @@ def draw(canvas):
     game.update()
     game.draw(canvas)
 
+# create a simplegui frame
+frame = simplegui.create_frame("Flappy bird game using hand control", width, height)
+# register simplegui frame keydown handler
+frame.set_draw_handler(draw)
