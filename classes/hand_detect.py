@@ -2,6 +2,19 @@ import cv2
 import numpy as np
 import math
 
+from sys import platform
+
+if platform == "linux" or platform == "linux2":
+    # linux
+    assert("linux not tested!")
+elif platform == "darwin":
+    # OS X: because Wudi cannot install pyautogui on my mac--sad
+    # https://github.com/msanders/autopy/
+    import autopy
+elif platform == "win32":
+    # Windows...
+    import pyautogui
+
 
 def detect_hand(img, hand_pos):
     '''
@@ -49,18 +62,37 @@ def detect_hand(img, hand_pos):
             cv2.circle(crop_img, far, 1, [0, 0, 255], -1)
         cv2.line(crop_img, start, end, [0, 255, 0], 2)
 
-    cv2.namedWindow('Gesture')
-    cv2.moveWindow('Gesture', 2000, 210)
+    if platform == "linux" or platform == "linux2":
+        # linux
+        assert("linux not tested!")
+    elif platform == "darwin":
+        # OS X: because Wudi cannot install pyautogui on my mac--sad
+        cv2.namedWindow('Gesture')
+        cv2.moveWindow('Gesture', 800, 210)
 
-    cv2.namedWindow('Hand')
-    cv2.moveWindow('Hand', 2000, 100-crop_img.shape[1])
-    
-    cv2.namedWindow('Thresholded')
-    cv2.moveWindow('Thresholded', 2000 + crop_img.shape[0], 100-crop_img.shape[1])
+        cv2.namedWindow('Hand')
+        cv2.moveWindow('Hand', 800, 100-crop_img.shape[1])
+        
+        cv2.namedWindow('Thresholded')
+        cv2.moveWindow('Thresholded', 800 + crop_img.shape[0], 100-crop_img.shape[1])
 
-    cv2.imshow('Gesture', img)
-    cv2.imshow('Hand', crop_img)
-    cv2.imshow('Thresholded', thresh_img)
+        cv2.imshow('Gesture', img)
+        cv2.imshow('Hand', crop_img)
+        cv2.imshow('Thresholded', thresh_img)
+    elif platform == "win32":
+        # Windows...
+        cv2.namedWindow('Gesture')
+        cv2.moveWindow('Gesture', 2000, 210)
+
+        cv2.namedWindow('Hand')
+        cv2.moveWindow('Hand', 2000, 100-crop_img.shape[1])
+        
+        cv2.namedWindow('Thresholded')
+        cv2.moveWindow('Thresholded', 2000 + crop_img.shape[0], 100-crop_img.shape[1])
+
+        cv2.imshow('Gesture', img)
+        cv2.imshow('Hand', crop_img)
+        cv2.imshow('Thresholded', thresh_img)
     print(count_defects)
 
     return count_defects
