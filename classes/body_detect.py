@@ -58,7 +58,7 @@ def detect_body(img, body_pos, hog, overlap_ratio=0.3):
         for (xA, yA, xB, yB) in pick:
             cv2.rectangle(img, (xA, yA), (xB, yB), (255, 255, 0), 2)
 
-        cv2.imshow('Gesture', img)
+        cv2.imshow('Body', img)
         cv2.imshow('Hand', crop_img)
 
     elif platform == "win32":
