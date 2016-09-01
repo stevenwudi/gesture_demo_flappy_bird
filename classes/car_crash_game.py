@@ -14,31 +14,27 @@ elif platform == "win32":
 
 body_pos = [0.5, 0.7, 0.1, 0.25]  # body position, size in relative
 
+
 class CarCrashGame:
     def __init__(self, cap, tracker):
         self.cap = cap
         self.tracker = tracker
-        self.jump_vertical_ratio = 0.008
-
-    def init_parcour_game(self):
-        if platform == "win32":
-            pyautogui.moveTo(850, 770, 2, pyautogui.easeInQuad)
-            pyautogui.click()
-            pyautogui.moveTo(800, 600, 2, pyautogui.easeInQuad)
-            pyautogui.click()
-        elif platform == "darwin":
-            autopy.mouse.smooth_move(800, 600)
-            autopy.mouse.click()
-
+        self.jump_vertical_ratio = 0.015
+        self.left_ratio = -0.01
+        self.right_ratio = 0.01
+        self.track_pos_prev = 0
+        self.font = cv2.FONT_HERSHEY_SIMPLEX
 
     def start_game(self, track_pos_prev):
         if platform == "win32":
-            pyautogui.moveTo(450, 870, 2, pyautogui.easeInQuad)
+            pyautogui.moveTo(650, 520)
+            pyautogui.click()
+            # following is to restart the game
+            pyautogui.moveTo(850, 420)
             pyautogui.click()
         elif platform == "darwin":
             autopy.mouse.smooth_move(300, 600)
             autopy.mouse.click()
-
         self.track_pos_prev = track_pos_prev
 
     def update(self, track_pos_prev):
@@ -46,20 +42,38 @@ class CarCrashGame:
         self.tracker.update(img)
         pos = self.tracker.get_position()
         track_pos_current = [(pos.left() + pos.right()) / 2., (pos.top() + pos.bottom()) / 2.]
-        vertical_ratio = (track_pos_current[1] - track_pos_prev[1]) / img.shape[1]
+        vertical_ratio = (track_pos_current[1] - track_pos_prev[1]) / img.shape[0]
+        horizontal_ratio = (track_pos_current[0] - track_pos_prev[0]) / img.shape[1]
         self.track_pos_prev = track_pos_prev
-        # we add the velocity is propotional to the hand motion function
-        self.flap_up_velocity = vertical_ratio / self.jump_vertical_ratio * 1
 
         print("Vertical ration is %f" % vertical_ratio)
+        print("Horitontal ration is %f\n" % horizontal_ratio)
         # if the ratio is larger than jump_vertical_ratio, then it is a jump
         if vertical_ratio > self.jump_vertical_ratio:
             if platform == "win32":
-                pyautogui.click()
+                pyautogui.press('j')
+                cv2.putText(img, 'J', (50, 50), self.font, 1, (0, 255, 0), 5)
+                print('J')
+            elif platform == "darwin":
+                autopy.mouse.click()
+
+        if horizontal_ratio > self.right_ratio:
+            if platform == "win32":
+                pyautogui.press('a')
+                cv2.putText(img, 'A', (50, 50), self.font, 1, (0, 255, 0), 5)
+                print('A')
+            elif platform == "darwin":
+                autopy.mouse.click()
+
+        if horizontal_ratio < self.left_ratio:
+            if platform == "win32":
+                pyautogui.press('d')
+                cv2.putText(img, 'D', (50, 50), self.font, 1, (0, 255, 0), 5)
+                print('D')
             elif platform == "darwin":
                 autopy.mouse.click()
 
         cv2.rectangle(img, (int(pos.right()), int(pos.bottom())), (int(pos.left()), int(pos.top())),
-                      (255, 0, 0), 0)
+                      (0, 255, 0), 3)
         cv2.imshow('Gesture', img)
         cv2.waitKey(1)
