@@ -52,28 +52,31 @@ class CarCrashGame:
         if vertical_ratio > self.jump_vertical_ratio:
             if platform == "win32":
                 pyautogui.press('j')
-                cv2.putText(img, 'J', (50, 50), self.font, 1, (0, 255, 0), 5)
-                print('J')
             elif platform == "darwin":
-                autopy.mouse.click()
+                autopy.key.type_string('j')
+
+            cv2.putText(img, 'J', (50, 50), self.font, 1, (0, 255, 0), 5)
+            print('J')
 
         if horizontal_ratio > self.right_ratio:
             if platform == "win32":
                 pyautogui.press('a')
-                cv2.putText(img, 'A', (50, 50), self.font, 1, (0, 255, 0), 5)
-                print('A')
             elif platform == "darwin":
-                autopy.mouse.click()
+                autopy.key.type_string('a')
+
+            cv2.putText(img, 'A', (50, 50), self.font, 1, (0, 255, 0), 5)
+            print('A')
 
         if horizontal_ratio < self.left_ratio:
             if platform == "win32":
                 pyautogui.press('d')
-                cv2.putText(img, 'D', (50, 50), self.font, 1, (0, 255, 0), 5)
-                print('D')
             elif platform == "darwin":
-                autopy.mouse.click()
+                autopy.key.type_string('d')
+
+        cv2.putText(img, 'D', (50, 50), self.font, 1, (0, 255, 0), 5)
+        print('D')
 
         cv2.rectangle(img, (int(pos.right()), int(pos.bottom())), (int(pos.left()), int(pos.top())),
                       (0, 255, 0), 3)
-        cv2.imshow('Gesture', img)
+        cv2.imshow('Body', img)
         cv2.waitKey(1)

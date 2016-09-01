@@ -48,18 +48,19 @@ def detect_body(img, body_pos, hog, overlap_ratio=0.3):
         assert ("linux not tested!")
     elif platform == "darwin":
         # OS X: because Wudi cannot install pyautogui on my mac--sad
-        cv2.namedWindow('Gesture')
-        cv2.moveWindow('Gesture', 800, 210)
+        cv2.namedWindow('Body')
+        cv2.moveWindow('Body', 800, 210)
 
-        cv2.namedWindow('Hand')
-        cv2.moveWindow('Hand', 800, 100 - crop_img.shape[1])
+        cv2.namedWindow('Croped')
+        cv2.moveWindow('Croped', 800, 100 - crop_img.shape[1])
 
-        cv2.namedWindow('Thresholded')
-        cv2.moveWindow('Thresholded', 800 + crop_img.shape[0], 100 - crop_img.shape[1])
+        # draw the final bounding boxes
+        for (xA, yA, xB, yB) in pick:
+            cv2.rectangle(img, (xA, yA), (xB, yB), (255, 255, 0), 2)
 
         cv2.imshow('Gesture', img)
         cv2.imshow('Hand', crop_img)
-        cv2.imshow('Thresholded', thresh_img)
+
     elif platform == "win32":
         # Windows...
         cv2.namedWindow('Body')
@@ -68,30 +69,30 @@ def detect_body(img, body_pos, hog, overlap_ratio=0.3):
         cv2.namedWindow('Croped')
         cv2.moveWindow('Croped', 2000, 200 - crop_img.shape[0])
 
-        # draw the final bounding boxes
+    # draw the final bounding boxes
+    for (xA, yA, xB, yB) in pick:
+        cv2.rectangle(img, (xA, yA), (xB, yB), (255, 255, 0), 2)
+
+    cv2.imshow('Body', img)
+    cv2.imshow('Croped', crop_img)
+
+    # draw the final bounding boxes
+    if len(pick) > 0:
         for (xA, yA, xB, yB) in pick:
             cv2.rectangle(img, (xA, yA), (xB, yB), (0, 255, 0), 2)
+            crop_img = img[yA:yB, xA:xB]
 
-        cv2.imshow('Body', img)
-        cv2.imshow('Croped', crop_img)
-
-        # draw the final bounding boxes
-        if len(pick) > 0:
-            for (xA, yA, xB, yB) in pick:
-                cv2.rectangle(img, (xA, yA), (xB, yB), (0, 255, 0), 2)
-                crop_img = img[yA:yB, xA:xB]
-
-                #overlap = (body_pos_img[0], body_pos_img[1]), (body_pos_img[2], body_pos_img[3])
-                xx1 = max(body_pos_img[0], xA)
-                yy1 = max(body_pos_img[1], yA)
-                xx2 = min(body_pos_img[2], xB)
-                yy2 = min(body_pos_img[3], yB)
-                overlap = float((yy2-yy1)*(xx2-xx1)) /area
-                if overlap > overlap_ratio:
-                    cv2.imshow('Body', img)
-                    cv2.imshow('Croped', crop_img)
-                    #cv2.waitKey(0)
-                    return True, [xx1, yy1, xx2, yy2]
+            #overlap = (body_pos_img[0], body_pos_img[1]), (body_pos_img[2], body_pos_img[3])
+            xx1 = max(body_pos_img[0], xA)
+            yy1 = max(body_pos_img[1], yA)
+            xx2 = min(body_pos_img[2], xB)
+            yy2 = min(body_pos_img[3], yB)
+            overlap = float((yy2-yy1)*(xx2-xx1)) /area
+            if overlap > overlap_ratio:
+                cv2.imshow('Body', img)
+                cv2.imshow('Croped', crop_img)
+                #cv2.waitKey(0)
+                return True, [xx1, yy1, xx2, yy2]
 
     return False, []
 
