@@ -13,19 +13,21 @@ Dependency:
 
 include almost all python academic pacakges
 
-(2) `dlib`:
+(2) `cmake`:
+
+(3)`boost`:
+
+(4) `dlib`:
 
 [http://dlib.net/](http://dlib.net/)
 
 Dlib is a modern C++ toolkit containing machine learning algorithms and tools for creating complex software in C++ to solve real world problems.
 
-(3) `opencv`:
+(5) `opencv`:
 
 [http://opencv.org/](http://opencv.org/)
 
-(4) `cmake`:
 
-(5)`boost`:
 
 
 Individual Game configuration
