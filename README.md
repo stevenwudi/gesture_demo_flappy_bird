@@ -1,4 +1,4 @@
-﻿# Flappy Bird Gesture Game Demo
+﻿# Gesture Game Demo
 
 Purpose
 =============
@@ -26,6 +26,13 @@ Dlib is a modern C++ toolkit containing machine learning algorithms and tools fo
 (4) `cmake`:
 
 (5)`boost`:
+
+
+Individual Game configuration
+-------
+For individual game configuration, please refer to the readme file under the classes folder.
+
+
 
 Contact
 -------
