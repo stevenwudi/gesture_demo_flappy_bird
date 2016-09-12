@@ -43,7 +43,7 @@ in_play = False
 # Image class
 class Image:
     def __init__(self, image_file, center, size, radius=0, lifespan=0, animated=False, tiles=1):
-        self.image = simplegui.load_image(image_file)
+        self.image = simplegui._load_local_image(image_file)
         self.center = center
         self.size = size
         self.radius = radius
@@ -76,7 +76,7 @@ class Image:
         return self.tiles
 
 
-PREFIX = 'http://codeskulptor-demos.commondatastorage.googleapis.com/pang/'
+PREFIX = './image/Pang/'
 
 SOUND_DIR = './sound/Pang/'
 # Images
