@@ -8,8 +8,8 @@ email: stevenwudi@gmail.com
 import dlib
 import cv2
 import SimpleGUICS2Pygame.simpleguics2pygame as simplegui
-from classes.flagg_bird_classes import draw, game, frame
-from classes.flagg_bird_classes import width, height, hand_pos, hand_convex_number
+from classes.flappy_bird_classes import draw, game, frame
+from classes.flappy_bird_classes import width, height, hand_pos, hand_convex_number
 from classes.hand_detect import detect_hand
 
 track_flag = False  # track flag indicate whether we have a hand detected and start tracking

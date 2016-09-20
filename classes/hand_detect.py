@@ -64,7 +64,18 @@ def detect_hand(img, hand_pos):
 
     if platform == "linux" or platform == "linux2":
         # linux
-        assert("linux not tested!")
+        cv2.namedWindow('Gesture')
+        cv2.moveWindow('Gesture', 800, 210)
+
+        cv2.namedWindow('Hand')
+        cv2.moveWindow('Hand', 800, 100 - crop_img.shape[1])
+
+        cv2.namedWindow('Thresholded')
+        cv2.moveWindow('Thresholded', 800 + crop_img.shape[0], 100 - crop_img.shape[1])
+
+        cv2.imshow('Gesture', img)
+        cv2.imshow('Hand', crop_img)
+        cv2.imshow('Thresholded', thresh_img)
     elif platform == "darwin":
         # OS X: because Wudi cannot install pyautogui on my mac--sad
         cv2.namedWindow('Gesture')
