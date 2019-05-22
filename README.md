@@ -27,6 +27,11 @@ Dlib is a modern C++ toolkit containing machine learning algorithms and tools fo
 
 [http://opencv.org/](http://opencv.org/)
 
+(6) `SimpleGUICS2Pygame`：
+
+`pip install SimpleGUICS2Pygame`
+
+
 
 
 
