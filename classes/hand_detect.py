@@ -4,17 +4,6 @@ import math
 
 from sys import platform
 
-if platform == "linux" or platform == "linux2":
-    # linux
-    assert("linux not tested!")
-elif platform == "darwin":
-    # OS X: because Wudi cannot install pyautogui on my mac--sad
-    # https://github.com/msanders/autopy/
-    import autopy
-elif platform == "win32":
-    # Windows...
-    import pyautogui
-
 
 def detect_hand(img, hand_pos):
     '''
@@ -29,7 +18,7 @@ def detect_hand(img, hand_pos):
     grey_img = cv2.cvtColor(crop_img, cv2.COLOR_BGR2GRAY)
     blurred_img = cv2.GaussianBlur(grey_img, ksize=(21, 21), sigmaX=0)
     _, thresh_img = cv2.threshold(blurred_img, 127, 255, cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
-    contours, hierarchy = cv2.findContours(thresh_img.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+    im2, contours, hierarchy = cv2.findContours(thresh_img.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
     max_area = -1
     for i in range(len(contours)):
         cnt = contours[i]
